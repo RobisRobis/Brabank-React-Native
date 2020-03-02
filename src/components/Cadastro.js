@@ -5,30 +5,63 @@ import {
     View, 
     Text, 
     TextInput, 
-    TouchableOpacity, Alert } from 'react-native';
+    TouchableOpacity, Alert, AsyncStorage } from 'react-native';
 
-export default class Login extends Component {
+export default class Cadastro extends Component {
 
     constructor(){
         super()
         this.state = {
             email: '',
-            senha: ''
+            senha: '',
         }
     }
 
-    entrar = (e) => {
-        Alert.alert('Bem-Vindo');
+    cadastrar = async (e) => {
+        if(!this.validar()) return
 
-        //envio dos dados para api
-    }
+        const {email, senha} = this.state;
 
-    cadastrar = (e) => {
-        this.props.navigation.navigate("Cadastro");
+        const params = {
+            method: "POST",
+            headers: {
+                "Content-type":"application/json"
+            },
+            body: JSON.stringify({
+                nome: 'Joaquin Barbosa',
+                cpf: '58594752680',
+                email: email,
+                sexo: 'A',
+                senha: senha
+            })
+        }
+
+        console.log(params.body);
+
+        try{
+            const retorno =  await fetch('http://10.107.144.24:3000/registrar', params);
+            
+            if(!retorno.ok)
+                return Alert.alert('Erro ao cadastrar');
+            
+            const usuario = await retorno.json();
+
+            console.log(usuario);
+            
+            Alert.alert("Cadastro com sucesso");
+            
+            AsyncStorage.setItem('token', 'true');
+
+            this.props.navigation.navigate('Home', {nome: usuario.usuario.nome})
+
+        }catch(e){
+            console.log(e);
+        }
     }
 
     validar = () => {
         const {email, senha} = this.state;
+
         if(!email || !senha){
             Alert.alert('Ops...', 'Todos os campos devem ser preenchidos');
             return false;
@@ -50,11 +83,8 @@ export default class Login extends Component {
                         style={styles.input}
                         placeholder="Sua Senha :"
                         onChangeText={senha => this.setState({senha:senha})}/>
-                    <TouchableOpacity style={styles.button} onPress={this.entrar}>
-                        <Text>Entrar</Text>
-                    </TouchableOpacity>
                     <TouchableOpacity style={styles.button} onPress={this.cadastrar}>
-                        <Text>Cadastrar</Text>
+                        <Text>Salvar</Text>
                     </TouchableOpacity>
                 </View>
             </View>
