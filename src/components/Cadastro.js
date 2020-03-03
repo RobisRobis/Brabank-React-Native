@@ -1,68 +1,51 @@
 import React, { Component } from 'react';
+import { cadastrar as cadastrarUsuario } from '../services/auth-service'
 
-import { 
+import {
     StyleSheet,
-    View, 
-    Text, 
-    TextInput, 
-    TouchableOpacity, Alert, AsyncStorage } from 'react-native';
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity, Alert, AsyncStorage
+} from 'react-native';
 
 export default class Cadastro extends Component {
 
-    constructor(){
+    constructor() {
         super()
         this.state = {
+            nome: '',
             email: '',
             senha: '',
+            sexo: '',
+            cpf: ''
         }
     }
 
     cadastrar = async (e) => {
-        if(!this.validar()) return
+        if (!this.validar()) return
 
-        const {email, senha} = this.state;
+        const usuario = this.state
+        usuario.nome = "Hoaquin"
+        usuario.sexo = "A"
+        usuario.cpf = "123456789"
 
-        const params = {
-            method: "POST",
-            headers: {
-                "Content-type":"application/json"
-            },
-            body: JSON.stringify({
-                nome: 'Joaquin Barbosa',
-                cpf: '58594752680',
-                email: email,
-                sexo: 'A',
-                senha: senha
-            })
-        }
+        console.log('passou')
+        const response = await cadastrarUsuario(usuario)
 
-        console.log(params.body);
+        if (!response.ok)
+            return Alert.alert('Erro ao cadastrar');
 
-        try{
-            const retorno =  await fetch('http://10.107.144.24:3000/registrar', params);
-            
-            if(!retorno.ok)
-                return Alert.alert('Erro ao cadastrar');
-            
-            const usuario = await retorno.json();
+        console.log(usuario);
 
-            console.log(usuario);
-            
-            Alert.alert("Cadastro com sucesso");
-            
-            AsyncStorage.setItem('token', 'true');
-
-            this.props.navigation.navigate('Home', {nome: usuario.usuario.nome})
-
-        }catch(e){
-            console.log(e);
-        }
+        Alert.alert("Cadastro com sucesso");
+        this.props.navigation.navigate('Home')
     }
 
     validar = () => {
-        const {email, senha} = this.state;
+        const { email, senha } = this.state;
 
-        if(!email || !senha){
+        if (!email || !senha) {
             Alert.alert('Ops...', 'Todos os campos devem ser preenchidos');
             return false;
         }
@@ -75,14 +58,14 @@ export default class Cadastro extends Component {
             <View style={styles.container}>
                 <View style={styles.form}>
                     <Text style={styles.titulo}>Tela de Login:</Text>
-                    <TextInput 
+                    <TextInput
                         style={styles.input}
-                        placeholder="Seu E-mail :" 
-                        onChangeText={texto => this.setState({email:texto})}/>
-                    <TextInput 
+                        placeholder="Seu E-mail :"
+                        onChangeText={texto => this.setState({ email: texto })} />
+                    <TextInput
                         style={styles.input}
                         placeholder="Sua Senha :"
-                        onChangeText={senha => this.setState({senha:senha})}/>
+                        onChangeText={senha => this.setState({ senha: senha })} />
                     <TouchableOpacity style={styles.button} onPress={this.cadastrar}>
                         <Text>Salvar</Text>
                     </TouchableOpacity>

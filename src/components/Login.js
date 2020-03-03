@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { isSignedIn, signIn } from '../services/auth-service'
 
 import { 
     StyleSheet,
@@ -17,9 +18,22 @@ export default class Login extends Component {
         }
     }
 
-    entrar = (e) => {
+    async componentDidMount (){
+        // const session = await isSignedIn();
+        // if(session);
+        // this.props.navigation.replace('Home');
+    }
+
+    entrar = async (e) => {
         Alert.alert('Bem-Vindo');
 
+        const usuario = this.state;
+
+        const response = await signIn(usuario); 
+
+        if(response.ok){
+            this.props.navigation.replace('Home')
+        }
         //envio dos dados para api
     }
 
